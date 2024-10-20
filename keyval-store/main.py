@@ -4,19 +4,30 @@ import json
 class KeyValueStore:
     def __init__(self, fileName='data.json'):
         self.fileName = fileName
-        self.store = {}
+        self.store = self.readFromFile()
+
+    def readFromFile(self):
+        if os.path.exists(self.fileName):
+            try:
+                with open(self.fileName, 'r') as file:
+                    return json.load(file)
+            except json.JSONDecodeError:
+                print(f"Warning: Could not decode the JSON file {self.fileName}. Initializing empty store.")
+                return {}
+        else:
+            return {}
     
     def writeToFile(self):
-        with open(self.fileName, 'w') as f:
-            json.dump(self.store, f)
-
+        with open(self.fileName, 'w') as file:
+            json.dump(self.store, file, indent=4)
+            
     def insert(self, key, value):
         self.store[key] = value
         self.writeToFile()
     
     def get(self, key):
         try:
-            return self.store.get(key)
+            return self.store.get(key, None)
         except Exception as e:
             print(f"Key {e} does not exist")
 
@@ -37,5 +48,5 @@ class KeyValueStore:
 dictionary1 = KeyValueStore()
 
 dictionary1.insert("hello", "world")
+dictionary1.insert("I love", "computer science")
 dictionary1.update("hello", "everyone")
-dictionary1.delete()
